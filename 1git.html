@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOSOGOH</title>
+
+<style>
+:root{
+  --bg:#e9e6e0;
+  --dark:#4c566a;
+  --line:#d5d2cc;
+  --yellow:#f3c300;
+  --soft:#f6f4ef;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  overflow:hidden;
+  color:#333;
+}
+
+header{
+  height:70px;
+  background:var(--dark);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 40px;
+  letter-spacing:2px;
+  font-weight:600;
+}
+
+.container{
+  height:calc(100vh - 70px);
+  display:flex;
+}
+
+/* ================= MAP ================= */
+
+.map-side{
+  width:62%;
+  border-right:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+  background:var(--soft);
+}
+
+.map-wrapper{
+  width:130%;          /* 🔥 基础再放大 */
+  max-width:1300px;
+  position:relative;
+  transition:transform .85s cubic-bezier(.4,0,.2,1);
+  transform-origin:top left;
+}
+
+.map-wrapper img{
+  width:100%;
+  display:block;
+}
+
+/* ===== 像素刷新（更大块）===== */
+
+.pixel{
+  position:absolute;
+  width:16px;
+  height:16px;
+  background:var(--bg);
+  opacity:1;
+  animation:pixelFade .8s forwards;
+}
+
+@keyframes pixelFade{
+  0%{opacity:1;}
+  100%{opacity:0;}
+}
+
+/* ===== 位置点 ===== */
+
+.tag{
+  position:absolute;
+  width:34px;
+  height:34px;
+  background:var(--yellow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  transition:.3s;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+.tag:hover{
+  transform:scale(1.15);
+}
+
+.tag.active{
+  box-shadow:
+    0 0 0 4px rgba(243,195,0,.3),
+    0 0 22px rgba(243,195,0,.8);
+}
+
+.tag-A{ top:24%; left:21%; }
+.tag-B{ top:82%; left:30%; }
+.tag-C{ top:53%; left:49%; }
+.tag-D{ top:31%; left:50%; }
+.tag-E{ top:19%; left:46%; }
+.tag-F{ top:7%; left:73%; }
+
+/* ================= RIGHT ================= */
+
+.board{
+  width:38%;
+  padding:60px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr 1fr;
+  gap:35px;
+  overflow:auto;
+}
+
+.card{
+  cursor:pointer;
+  position:relative;
+  background:white;
+  padding:18px;
+  transition:.3s;
+  border:1px solid var(--line);
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+.card h3{
+  font-size:14px;
+  letter-spacing:1.5px;
+  margin-bottom:14px;
+  position:relative;
+  padding-left:14px;
+}
+
+.card h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:4px;
+  width:6px;
+  height:14px;
+  background:var(--yellow);
+}
+
+.img-box{
+  position:relative;
+  overflow:hidden;
+}
+
+.img-box img{
+  width:100%;
+  display:block;
+  transition:.4s;
+}
+
+.img-box::before,
+.img-box::after{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  border-top:3px solid var(--yellow);
+  border-left:3px solid var(--yellow);
+  top:0;
+  left:0;
+}
+
+.img-box::after{
+  border:none;
+  border-bottom:3px solid var(--yellow);
+  border-right:3px solid var(--yellow);
+  bottom:0;
+  right:0;
+  top:auto;
+  left:auto;
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  color:white;
+  padding:18px;
+  font-size:12px;
+  line-height:1.6;
+  display:flex;
+  align-items:flex-end;
+  opacity:0;
+  transform:translateY(15px);
+  transition:.4s;
+}
+
+.card:hover img{
+  filter:brightness(.65);
+  transform:scale(1.05);
+}
+
+.card:hover .overlay{
+  opacity:1;
+  transform:translateY(0);
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>LOSGOGH</div>
+  <div style="font-size:13px;opacity:.7;">PRIVATE MC SERVER</div>
+</header>
+
+<div class="container">
+
+<section class="map-side">
+  <div id="mapWrapper" class="map-wrapper">
+    <img src="/mcgweb/1.png">
+
+    <div class="tag tag-A" onclick="toggleZoom('A',this)">A</div>
+    <div class="tag tag-B" onclick="toggleZoom('B',this)">B</div>
+    <div class="tag tag-C" onclick="toggleZoom('C',this)">C</div>
+    <div class="tag tag-D" onclick="toggleZoom('D',this)">D</div>
+    <div class="tag tag-E" onclick="toggleZoom('E',this)">E</div>
+    <div class="tag tag-F" onclick="toggleZoom('F',this)">F</div>
+  </div>
+</section>
+
+<section class="board">
+
+  <div class="card" onmouseenter="zoomMap('A')" onmouseleave="resetMap()">
+    <h3>A 向日葵平原</h3>
+    <div class="img-box">
+      <img src="/mcgweb/A1.png">
+      <div class="overlay">位于地势平缓的河流凸岸，长满向日葵，与咕村距离恰当，可用土地宽阔，适合建造农场和小木屋。</div>
+    </div>
+  </div>
+
+  <div class="card" onmouseenter="zoomMap('B')" onmouseleave="resetMap()">
+    <h3>B 南部草甸</h3>
+    <div class="img-box">
+      <img src="/mcgweb/A2.png">
+      <div class="overlay">南部草甸 适合那些俯瞰自己领土的人!没有人比您更接近天空和地平线。位于南部的高山顶部，面积广阔，附带一个小村庄和一个可以改造为湖泊的溶洞。相信我，如果下面是海，那它的风景绝对不输给法罗群岛。</div>
+    </div>
+  </div>
+
+  <div class="card" onmouseenter="zoomMap('C')" onmouseleave="resetMap()">
+    <h3>C 白桦林水库</h3>
+    <div class="img-box">
+      <img src="/mcgweb/A3.png">
+      <div class="overlay">一片心旷神怡的白桦林，再加上一个巨大的水库!已经迫不及待的想要体验这种朴素又自然的养老生活了，地形平坦，不过要注意下信标的限高政策和自然植被的修复。</div>
+    </div>
+  </div>
+
+  <div class="card" onmouseenter="zoomMap('D')" onmouseleave="resetMap()">
+    <h3>D 雪山东南坡顶</h3>
+    <div class="img-box">
+      <img src="/mcgweb/A4.png">
+      <div class="overlay">没有什么是比登顶一座雪山更赞的的了!处于咕村平原内唯一的雪山的东南坡，下方便是一片森林和稀散的河流，但地形崎岖，如果想建个大点的家估计要花点时间来整整理整理地形。</div>
+    </div>
+  </div>
+
+  <div class="card" onmouseenter="zoomMap('E')" onmouseleave="resetMap()">
+    <h3>E 雪山西北湖畔</h3>
+    <div class="img-box">
+      <img src="/mcgweb/A5.png">
+      <div class="overlay">如果有比住进一座雪山更赞的事情，那一定是在雪山之下还有一片湖!坐拥咕村平原最大的水系，地势平整略带斜度，别忘了在您搬进新家的时候去嘲讽一下您的邻居。</div>
+    </div>
+  </div>
+
+  <div class="card" onmouseenter="zoomMap('F')" onmouseleave="resetMap()">
+    <h3>F 湖边森林</h3>
+    <div class="img-box">
+      <img src="/mcgweb/A6.png">
+      <div class="overlay">环大洋区的一分子，在陆地?勉强算在咕村吧!距海岸线不到一分钟路程，还包括一个不深不浅的湖泊。</div>
+    </div>
+  </div>
+
+</section>
+
+</div>
+
+<script>
+
+const mapWrapper=document.getElementById("mapWrapper");
+const mapSide=document.querySelector(".map-side");
+
+let currentZone=null;
+let zoomed=false;
+
+function pixelEffect(){
+  for(let i=0;i<120;i++){
+    const p=document.createElement("div");
+    p.className="pixel";
+    p.style.left=Math.random()*mapWrapper.offsetWidth+"px";
+    p.style.top=Math.random()*mapWrapper.offsetHeight+"px";
+    mapWrapper.appendChild(p);
+    setTimeout(()=>p.remove(),900);
+  }
+}
+
+function toggleZoom(zone,el){
+
+  if(zoomed && currentZone===zone){
+    resetMap();
+    document.querySelectorAll(".tag").forEach(t=>t.classList.remove("active"));
+    zoomed=false;
+    currentZone=null;
+    return;
+  }
+
+  zoomMap(zone);
+  document.querySelectorAll(".tag").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+
+  zoomed=true;
+  currentZone=zone;
+}
+
+function zoomMap(zone){
+
+  pixelEffect();
+
+  const tag=document.querySelector(".tag-"+zone);
+  const scale=1.2;
+
+  const tagX=tag.offsetLeft+tag.offsetWidth/2;
+  const tagY=tag.offsetTop+tag.offsetHeight/2;
+
+  const sideWidth=mapSide.offsetWidth;
+  const sideHeight=mapSide.offsetHeight;
+
+  const centerX=sideWidth/2;
+  const centerY=sideHeight/2 - 60;  /* 上移修正 */
+
+  const moveX=centerX-tagX*scale;
+  const moveY=centerY-tagY*scale;
+
+  mapWrapper.style.transform=
+  `translate(${moveX}px,${moveY}px) scale(${scale})`;
+}
+
+function resetMap(){
+  mapWrapper.style.transform="scale(1)";
+}
+
+</script>
+
+</body>
+</html>
